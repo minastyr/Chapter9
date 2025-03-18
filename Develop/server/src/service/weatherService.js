@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-//const apiKey = process.env.WEATHER_API_KEY;
-const apiKey = "54a1826f6716bcdb5dca81a9e7de5676";
+const apiKey = process.env.WEATHERAPIKEY;
 const baseUrl = "https://api.openweathermap.org/data/2.5/forecast";
 const baseCoordsUrl = "http://api.openweathermap.org/geo/1.0/direct";
 const tempUnits = "imperial";
