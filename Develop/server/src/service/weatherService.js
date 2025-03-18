@@ -104,9 +104,7 @@ class Weather {
 
 class WeatherService {
   async getCityStateCountryCoords(cityName, state, country) {
-    console.log(
-      `${baseCoordsUrl}?q=${cityName},${state},${country}&appid=${apiKey}`
-    );
+
     const response = await fetch(
       `${baseCoordsUrl}?q=${cityName},${state},${country}&appid=${apiKey}`
     );
