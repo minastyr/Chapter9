@@ -16,6 +16,7 @@ An app to get the latest weather of a city, state, country you enter as well as 
 
 ## Installation
 The app is already installed at https://chapter9.onrender.com/
+The repo is at https://github.com/minastyr/Chapter9
 
 
 ## Usage
