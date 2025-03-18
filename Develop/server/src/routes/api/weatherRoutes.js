@@ -1,14 +1,34 @@
 import { Router } from 'express';
 const router = Router();
-// import HistoryService from '../../service/historyService.js';
-// import WeatherService from '../../service/weatherService.js';
-// TODO: POST Request with city name to retrieve weather data
-router.post('/', (req, res) => {
-    // TODO: GET weather data from city name
-    // TODO: save city to search history
+import { v4 as uuidv4 } from 'uuid';
+
+import WeatherService from '../../service/weatherService.js';
+import HistoryService, { City } from '../../service/historyService.js';
+
+router.post('/getWeather', async (req, res) => {
+    const { cityName, state, country } = req.body;
+
+    // Validate input
+    if (!cityName?.trim() || !state?.trim() || !country?.trim()) {
+        return res.status(400).json({ error: 'City name, state, and country are required and cannot be empty' });
+    }
+
+    try {
+        // Get coordinates and weather data
+        const coords = await WeatherService.getCityStateCountryCoords(cityName, state, country);
+        const weather = await WeatherService.getWeatherByCoordinates(coords.latitude, coords.longitude);
+
+        // Save city to history
+        const city = new City(uuidv4(), cityName); // Use UUID for unique ID
+        HistoryService.addCity(city);
+
+        // Send weather data as response
+        res.json(weather);
+    } catch (error) {
+        console.error('Error in /api/weather/getWeather route:', error);
+        res.status(500).json({ error: error.message || 'Internal Server Error' });
+    }
 });
-// TODO: GET search history
-router.get('/history', async (req, res) => { });
-// * BONUS TODO: DELETE city from search history
-router.delete('/history/:id', async (req, res) => { });
+
 export default router;
+

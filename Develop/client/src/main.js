@@ -15,18 +15,41 @@ const humidityEl = document.getElementById('humidity');
 API Calls
 
 */
-const fetchWeather = async (cityName) => {
-    const response = await fetch('/api/weather/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cityName }),
-    });
-    const weatherData = await response.json();
-    console.log('weatherData: ', weatherData);
-    renderCurrentWeather(weatherData[0]);
-    renderForecast(weatherData.slice(1));
+const fetchWeather = async (cityName, state, country) => {
+    try {
+        const requestBody = { cityName, state, country }; // Define the request body
+        console.log('Request body being sent:', requestBody); // Log the request body
+
+        const response = await fetch('/api/weather/getWeather', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+    
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Network response was not ok:', response.status, errorText);
+            throw new Error('Network response was not ok');
+        }
+
+
+        const weatherData = await response.json();
+
+        if (!weatherData || !weatherData.city || !weatherData.temperature || !weatherData.coordinates) {
+            throw new Error('Invalid data structure');
+        }
+
+        console.log('weatherData: ', weatherData);
+        // renderCurrentWeather(weatherData[0]);
+        renderCurrentWeather(weatherData);
+        renderForecast(weatherData.slice(1));
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+    }
 };
 const fetchSearchHistory = async () => {
     const history = await fetch('/api/weather/history', {
@@ -44,21 +67,21 @@ const deleteCityFromHistory = async (id) => {
             'Content-Type': 'application/json',
         },
     });
-};
+}; 
 /*
 
 Render Functions
 
 */
 const renderCurrentWeather = (currentWeather) => {
-    const { city, date, icon, iconDescription, tempF, windSpeed, humidity } = currentWeather;
+    const { city, date, icon, iconDescription, temperature, windSpeed, humidity } = currentWeather;
     // convert the following to typescript
     heading.textContent = `${city} (${date})`;
     weatherIcon.setAttribute('src', `https://openweathermap.org/img/w/${icon}.png`);
     weatherIcon.setAttribute('alt', iconDescription);
     weatherIcon.setAttribute('class', 'weather-img');
     heading.append(weatherIcon);
-    tempEl.textContent = `Temp: ${tempF}°F`;
+    tempEl.textContent = `Temp: ${temperature}°F`;
     windEl.textContent = `Wind: ${windSpeed} MPH`;
     humidityEl.textContent = `Humidity: ${humidity} %`;
     if (todayContainer) {
@@ -181,7 +204,12 @@ const handleSearchFormSubmit = (event) => {
         throw new Error('City cannot be blank');
     }
     const search = searchInput.value.trim();
-    fetchWeather(search).then(() => {
+    const [cityName, state, country] = search.split(',').map(part => part.trim());
+    if (!cityName || !state || !country) {
+        throw new Error('Please enter city, state, and country separated by commas');
+    }
+
+    fetchWeather(cityName, state, country).then(() => {
         getAndRenderHistory();
     });
     searchInput.value = '';
