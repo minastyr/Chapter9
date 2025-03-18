@@ -1,8 +1,24 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { Router } from 'express';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const router = Router();
-// TODO: Define route to serve index.html
+
+
+router.get('/history', async (_req, res) => {
+  try {
+      const history = await HistoryService.getHistory();
+      res.json(history);
+  } catch (error) {
+      res.status(500).json({ error: 'Error retrieving search history' });
+  }
+});
+
+// DELETE Request to delete a city from search history
+router.delete('/history/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+      HistoryService.deleteCity(Number(id));
+      res.json({ message: `City with id ${id} deleted from history` });
+  } catch (error) {
+      res.status(500).json({ error: 'Error deleting city from history' });
+  }
+});
 export default router;
