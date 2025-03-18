@@ -1,32 +1,33 @@
-// TODO: Define a City class with name and id properties
-// TODO: Complete the HistoryService class
 class City {
-    constructor(id, name) {
-        this.id = id;
-        this.name = name;
-    }
+  constructor(id, name, state, country, latitude, longitude) {
+    this.id = id;
+    this.name = name;
+    this.state = state;
+    this.country = country;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
 }
-
 
 class HistoryService {
-    constructor() {
-        this.history = [];
+  constructor() {
+    this.history = [];
+  }
+  getHistory() {
+    return this.history;
+  }
+  addCity(city) {
+    this.history.push(city);
+  }
+  deleteCity(id) {
+    const index = this.history.findIndex((city) => city.id === id);
+    if (index !== -1) {
+      this.history.splice(index, 1); // Remove the city from the array
+      return true;
     }
-    getHistory() {
-        return this.history;
-    }
-    addCity(city) {
-        console.log('in the addCity function');
-        console.log(city);
-        this.history.push(city);
-        console.log(this.history);
-    }
-    deleteCity(id) {
-        this.history = this.history.filter((city) => city.id !== id);
-    }
+    return false; // City not found
+  }
 }
 
-/* const historyService = new HistoryService();
-historyService.addCity(new City(city)); */
 export { City };
 export default new HistoryService();
